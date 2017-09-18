@@ -2,7 +2,7 @@
 title: "Gapminder Data Exploration"
 author: "Victoria Michalowski"
 date: "September 18, 2017"
-output: html_document
+output: github_document
 ---
 
 ```{r}
