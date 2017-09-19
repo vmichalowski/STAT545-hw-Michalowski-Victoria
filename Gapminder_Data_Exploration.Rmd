@@ -5,7 +5,80 @@ date: "September 18, 2017"
 output: github_document
 ---
 
+#Exploring Gapminder Data
+
+## This is the extension and polishing of R markdown documentation started in class on September 14, 2017.
+
+## The first step is to load in the gapminder data.
 ```{r}
+library(tidyverse)
+library(gapminder)
+summary(gapminder)
+str(gapminder) #overview of the data frame, displays the structure of the object
+gapminder #because of tidyverse, can print the data frame to the screen without cluttering the console
+```
+## Next, understand the data frames by inspecting the number of rows and columns.
+```{r}
+class(gapminder)
+names(gapminder)
+ncol(gapminder)
+nrow(gapminder)
+dim(gapminder)
+```
+## Do basic statistical and visual checks for each variable. There are six variables in the data frame: country, continent, year, lifeExp, pop, gdpPercap.
+
+### 1. country
+```{r}
+class(gapminder$country)
+nlevels(gapminder$country)
+levels(gapminder$country)
+summary(gapminder$country)
+```
+
+### 2. continent
+```{r}
+class(gapminder$continent)
+nlevels(gapminder$continent)
+levels(gapminder$continent)
+summary(gapminder$continent)
+barplot(table(gapminder$continent))
+```
+
+### 3. year
+```{r}
+class(gapminder$year)
+summary(gapminder$year)
+```
+
+### 4. lifeExp
+```{r}
+class(gapminder$lifeExp)
+summary(gapminder$lifeExp)
+hist(gapminder$lifeExp)
+```
+
+### 5. pop
+```{r}
+class(gapminder$pop)
+summary(gapminder$pop)
+hist(gapminder$pop)
+```
+
+### 6. gdpPercap
+```{r}
+class(gapminder$gdpPercap)
+summary(gapminder$gdpPercap)
+hist(gapminder$gdpPercap)
+```
+
+## And lastly, some basic plots to visualize basic relationships in the data.
+
+```{r}
+plot(lifeExp ~ log(pop), gapminder)
+plot(log(gdpPercap) ~ log(pop), gapminder)
+plot(lifeExp ~ continent, gapminder)
+plot(lifeExp ~ country, gapminder)
 
 ```
+
 
