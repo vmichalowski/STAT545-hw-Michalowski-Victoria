@@ -1,0 +1,263 @@
+---
+title: "Homework 2"
+author: "Victoria Michalowski"
+date: "September 26, 2017"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(gapminder)
+```
+
+##Exploring the gapminder object.
+
+The gapminder object is a list..
+
+```{r}
+typeof(gapminder)
+```
+
+It's class is data.frame.
+
+```{r}
+class(gapminder)
+```
+It has 6 columns or variables (country, continent, year, lifeExp, pop, and gdpPercap).
+```{r}
+ncol(gapminder)
+```
+
+It has 1704 rows or observations.
+
+```{r}
+nrow(gapminder)
+```
+
+The str() or the dim() functions can give the above information about about "extent" or "size" as well.
+
+```{r}
+str(gapminder)
+dim(gapminder)
+```
+
+The str() function gives information about what data type each variables is too. From str(gapminder), we know the following:
+country: factor (with 142 levels)
+continent: factor (with 5 levels)
+year: integer
+lifeExp: number
+pop: integer
+gdpPercap: number
+
+##Exploring individual variables.
+
+a. A categorical variable: continent
+
+```{r}
+gapminder$continent
+table(gapminder$continent)
+```
+
+The possible values for continent are Africa, Americas, Asia, Europe, and Oceania.
+The most observations are for Africa (N = 624), while the least observations are for Oceania (N = 24). The Americas (N = 300), Asia (N = 396), and Europe (N = 360) have a comparable number of observations.
+
+b. A quantitative variable: pop
+
+```{r}
+gapminder$pop
+summary(gapminder$pop)
+sd(gapminder$pop)
+hist(log(gapminder$pop))
+```
+
+The possible values for pop are 60,010 to 1,319,000,000 (M = 29,600,000, SD = 106,157,897).
+
+##Exploring various ggplot2 plot types. Using dplyr functions: filer(), select(), and %>%.
+
+Say I want to only look at data in Canada.
+
+```{r}
+filter(gapminder, country == "Canada")
+```
+
+But I am most interested in data since 2000.
+
+```{r}
+filter(gapminder, country == "Canada", year >= 2000)
+```
+
+What if I was interested in data in the 90s instead?
+
+```{r}
+filter(gapminder, country == "Canada" & year %in% 1990:1999)
+```
+
+Maybe I want to see data from Canada and Poland.
+
+```{r}
+filter(gapminder, country %in% c("Canada", "Poland"))
+```
+
+And I want to see what was going on in the 90s for both countries.
+
+```{r}
+filter(gapminder, country %in% c("Canada", "Poland") & year %in% 1990:1999)
+```
+
+Say I'm only interested in life expectancy and gdp per capita for each country.
+
+```{r}
+select(gapminder, country, lifeExp, gdpPercap, pop)
+```
+
+##Combining filter() and select() by piping.
+
+```{r}
+gapminder %>% 
+filter(country %in% c("Canada", "Poland") & year %in% 1990:1999) %>% 
+select(country, year, lifeExp, gdpPercap, pop)
+```
+
+##Exploring other dplyr functions.
+
+```{r}
+gapminder %>%
+filter(country %in% c("Canada", "Poland")) %>% 
+select(country, year, lifeExp, gdpPercap, pop) %>% 
+arrange(year)
+
+gapminder %>%
+filter(country %in% c("Canada", "Poland")) %>% 
+select(country, year, lifeExp, gdpPercap, pop) %>% 
+group_by(country)
+```
+
+
+##Piping into ggplot.
+
+How do Canada and Poland compare in terms of life expectancy from 1952 until 2007?
+
+```{r}
+gapminder %>%
+filter(country %in% c("Canada", "Poland")) %>% 
+select(year, country, lifeExp) %>% 
+ggplot(aes(x=year, y=lifeExp)) + geom_line(aes(colour = country))
+```
+
+Both countries experience an increase in life expectancy through the years, but interestingly, Poland flat lines between the 70s and early 90s, and then has an increase in life expectancy again. Canada on the other hand experiences a steady increase throughout, and generally enjoys higher life expectancy compared to Poland.
+
+How do they compare, in the context of all other countries?
+
+```{r}
+gapminder %>% 
+ggplot(aes(year, lifeExp, group=country)) +
+    geom_line(alpha=0.1) +
+    geom_line(aes(year, lifeExp, colour = country), data=subset(gapminder, country == "Canada" | country == "Poland"))
+```
+
+Compared to other countries, Canada and Poland have high life expectancy.
+
+Beyond life expectancy, how do Canada and Poland compare on population?
+
+```{r}
+gapminder %>%
+filter(country %in% c("Canada", "Poland")) %>% 
+select(year, country, pop) %>% 
+ggplot(aes(x=year, y=pop)) + geom_line(aes(colour = country))
+```
+
+Both have steadily increased, with Poland generally having a higher population than Canada. However, Poland appears to be experiencing a stagnation and even drop in population starting in the late 80s, whereas Canada's population continues to climb.
+
+What about in the context of the rest of the world?
+
+```{r}
+gapminder %>% 
+ggplot(aes(year, pop, group=country)) +
+    geom_line(alpha=0.1) +
+    geom_line(aes(year, pop, colour = country), data=subset(gapminder, country == "Canada" | country == "Poland")) +
+    scale_y_log10()
+```
+
+Canada and Poland occupy similar growth rates in population relative to other countries.
+
+How do they compare with regards to GDP per capita?
+
+```{r}
+gapminder %>%
+filter(country %in% c("Canada", "Poland")) %>% 
+select(year, country, gdpPercap) %>% 
+ggplot(aes(x=year, y=gdpPercap)) + geom_line(aes(colour = country))
+```
+
+Canada shows a steeper growth rate in GDP per capita, whereas Poland showed stagnation from the mid 70s through to the early 90s, and then a sharp increase since then. Canada generally has a higher GDP per capita compared to Poland.
+
+How do they compare in the context of the rest of the world?
+
+```{r}
+gapminder %>% 
+ggplot(aes(year, gdpPercap, group=country)) +
+    geom_line(alpha=0.1) +
+    geom_line(aes(year, gdpPercap, colour = country), data=subset(gapminder, country == "Canada" | country == "Poland"))
+```
+
+Canada has pretty high GDP per capita compared to most countries, whereas Poland appears to be closer to where most other countries are.
+
+Life expectancy, GDP per capita, and population are probably higher interrelated factors. Let's explore that idea further.
+
+First, let's look at the relationship between life expectancy and GDP per capita for Poland and Canada.
+
+```{r}
+gapminder %>%
+filter(country %in% c("Canada", "Poland")) %>% 
+select(year, country, gdpPercap, lifeExp, continent, pop) %>% 
+ggplot(aes(x=gdpPercap, y=lifeExp)) + geom_point(aes(colour = country, size = pop), alpha = 0.35)
+```
+
+For Canada, it seems like higher population is associated with higher GDP per capita, and higher life expectancy. Along the same vein, higher life expectancy seems to go along with higher GDP per capita.
+For Poland, population does not seem to be related to life expectancy or GDP per capita. However, like with Canada, higher life expectancy seems to correlate with GDP per capita.
+
+How do those relationships play out for other countries in the Americas and Europe?
+
+```{r}
+gapminder %>%
+filter(continent %in% c("Americas", "Europe")) %>% 
+select(year, country, gdpPercap, lifeExp, continent, pop) %>% 
+ggplot(aes(gdpPercap, lifeExp, group=country, colour = continent)) + geom_point(aes(size = pop), alpha = 0.35) 
+```
+
+It seems that they follows the same patterns as Canada and Poland did individually.
+
+How do Poland and Canada directly fit in, in comparison to other countries in their respective continents?
+
+```{r}
+gapminder %>%
+filter(continent %in% c("Americas", "Europe")) %>% 
+select(year, country, gdpPercap, lifeExp, continent, pop) %>% 
+ggplot(aes(gdpPercap, lifeExp, group=country, colour = continent)) +
+geom_point(aes(size = pop), alpha = 0.35) +
+geom_point(aes(gdpPercap, lifeExp, colour=country, size=pop), data=subset(gapminder, country == "Canada" | country == "Poland"), alpha = 0.7)
+```
+
+Poland seems to have a steeper slope between life expectancy and GDP per capita compared to most other European countries, and some countries in the Americas. Canada seems to have a steeper slope compared so some countries in the Americas, but a slighter slope than most European countries.
+
+##Taking things further.
+
+Presumably, the intent of the code below is to get the data for Rwanda and Afghanistan.
+
+```{r}
+filter(gapminder, country == c("Rwanda", "Afghanistan"))
+```
+
+The code does not succeed in getting all of the data for Rwanda and Afghanistan. Using "==" to select one category of the country variable would be acceptable, but it doesn't work for when you want to select more than one category, because "==" tells R that country is equal to Rwanda and Afghanistan, where they cannot overlap in one case (i.e. not allowed to share the same year, for instance). Using "c()" creates a vector, and to code that country is an element in the vector that includes Rwanda and Afghanistan, we use "%in%", rather than "==", to allow the same years to be included for each country. In fact, what happens when we use "==" instead of "%in%" is that it cuts the data in half for each country, as the code does not allow for cases where both countries have data for the same year.
+
+The code below uses "%in%" instead of "==" to include all data from Afghanistan and Rwanda.
+
+```{r}
+filter(gapminder, country %in% c("Rwanda", "Afghanistan"))
+```
+
+##Report of progress.
+Using ggplot for the first time was probably the hardest task for me in this assignment. I knew I wanted to create plots that graphed how variables changed across time, since a lot of the data I use is situated in time (various time intervals within days, days, years, etc.) and I am especially interested in how to visualize change and time with ggplot. The first challenge I had was how to move away from having data points on the plots, to having lines, which I solved when I tried the geom_line function. Next, I wanted to look at how Canada and Poland compared to other countries, graphically. I tried looking up how to do this on google, but I don't know enough ggplot terminology to search for what I was trying to do. So I asked a TA in class how to do this, and she showed me the subset() command, which made a lot of sense when you think of ggplot as a layering system. Part of what I wanted to do involved comparing specific countries, while ignoring the rest of the data, so piping came in handy for that. It was pretty intuitive to extend piping to ggplot, even though we hadn't covered it in class at that point. Dyplr logic was on the other hand was a little tough to get the hang of, but once I practiced and played around with what worked and what didn't, I got a better understanding of how it works.
+
+
