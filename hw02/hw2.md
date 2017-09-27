@@ -1015,8 +1015,3 @@ filter(gapminder, country %in% c("Rwanda", "Afghanistan"))
     ## 9  Afghanistan      Asia  1992  41.674 16317921  649.3414
     ## 10 Afghanistan      Asia  1997  41.763 22227415  635.3414
     ## # ... with 14 more rows
-
-Report of progress.
--------------------
-
-Using ggplot for the first time was probably the hardest task for me in this assignment. I knew I wanted to create plots that graphed how variables changed across time, since a lot of the data I use is situated in time (various time intervals within days, days, years, etc.) and I am especially interested in how to visualize change and time with ggplot. The first challenge I had was how to move away from having data points on the plots, to having lines, which I solved when I tried the geom\_line function. Next, I wanted to look at how Canada and Poland compared to other countries, graphically. I tried looking up how to do this on google, but I don't know enough ggplot terminology to search for what I was trying to do. So I asked a TA in class how to do this, and she showed me the subset() command, which made a lot of sense when you think of ggplot as a layering system. Part of what I wanted to do involved comparing specific countries, while ignoring the rest of the data, so piping came in handy for that. It was pretty intuitive to extend piping to ggplot, even though we hadn't covered it in class at that point. Dyplr logic was on the other hand was a little tough to get the hang of, but once I practiced and played around with what worked and what didn't, I got a better understanding of how it works.
