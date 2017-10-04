@@ -1,8 +1,8 @@
-Here's a link to my Homework 3 md file.
+Here's a link to my [Homework 3 md file.] (https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw03/hw3.md)
 
 PROCESS
 
-I've mentioned a few of the difficulties I had with this assignment (i.e. not accounting for zeroes in task 4, struggling to understand plots that include lagged life expectancy) that I was not able to totally resolve by the end of this assignment, but I'd like to acknowledge and continue trying to solve these issues.
+I mentioned a few of the difficulties I had with this assignment (i.e. not accounting for zeroes in task 4, struggling to understand plots that include lagged life expectancy) in my md file. I was not able to totally resolve these issues by the end of this assignment, but I'd like to acknowledge and continue trying to solve them.
 
 Otherwise, I found it rewarding to get tasks and go about trying to complete them. It feels like dyplr and ggplot are becoming more intuitive with practice. I found that I was sinking a lot of time into working out details of graphs that weren't essential to communicating the analysis, but I also wanted to use this opportunity to play around with the different ways I could customize graphs with ggplot, so I don't regret doing so. But I would definitely like to balance my time on that better in the future.
 I was also happy to find out there were many resources for questions that came up for me while working through the tasks. The links listed below were particularly helpful to me.
