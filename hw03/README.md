@@ -1,4 +1,4 @@
-Here's a link to my [Homework 3 md file.] (https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw03/hw3.md)
+Here's a link to my [Homework 3.](https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw03/hw3.md)
 
 PROCESS
 
