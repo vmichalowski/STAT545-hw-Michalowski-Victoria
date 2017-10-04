@@ -8,7 +8,10 @@ Otherwise, I found it rewarding to get tasks and go about trying to complete the
 I was also happy to find out there were many resources for questions that came up for me while working through the tasks. The links listed below were particularly helpful to me.
 
 Different types of ggplot options: https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf
+
 Different ggplot colors: http://sape.inf.usi.ch/quick-reference/ggplot2/colour
+
 For examples of how to adapt ggplot boxplot code: http://ggplot2.tidyverse.org/reference/geom_boxplot.html and http://t-redactyl.io/blog/2016/04/creating-plots-in-r-using-ggplot2-part-10-boxplots.html
+
 The dyplr cheatsheet that Joey posted on Slack :)
 
