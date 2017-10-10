@@ -1,4 +1,4 @@
-This is my [homework 4 md file]().
+This is my [homework 4 md file](https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw04/hw04.md).
 
 PROCESS
 
