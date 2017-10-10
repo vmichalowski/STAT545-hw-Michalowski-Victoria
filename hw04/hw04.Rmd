@@ -1,0 +1,232 @@
+---
+title: "hw04"
+author: "Victoria Michalowski"
+date: "October 10, 2017"
+output: github_document
+---
+
+```{r}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(gapminder))
+suppressPackageStartupMessages(library(plyr))
+```
+
+#General data reshaping and relationship to aggregation.
+
+##Activity #2.
+
+- Make a tibble with one row per year and columns for life expectancy for two or more countries.
+- Use knitr::kable() to make this table look pretty in your rendered homework.
+- Take advantage of this new data shape to scatterplot life expectancy for one country against that of another.
+
+For this activity, I decided to follow up on my work in Homework 2, where I compared Poland and Canada across time. Here, I re-structured the data so that there is one row per year, and one column for Life Expectancy for Canada, and another for Life Expectancy for Poland.
+
+```{r}
+#created a tibble that only included life expectancy for Canada
+gapminderA <- gapminder %>% 
+  select(year, country, lifeExp) %>% 
+  filter(country=="Canada") %>% 
+  select(year, lifeExp) %>% 
+  rename(c("lifeExp" = "Canada_lifeExp"))
+
+#created another tibble, this time including only life expectancy for Poland
+gapminderB <- gapminder %>% 
+  select(year, country, lifeExp) %>% 
+  filter(country=="Poland") %>% 
+  select(year, lifeExp) %>% 
+  rename(c("lifeExp" = "Poland_lifeExp"))
+
+#joined the two tibbles, so that there was one row for each year, and a column for life expectancy of Poland, and another such column for Canada
+gapminderC <- left_join(gapminderA, gapminderB)
+
+#used the knitr::kable() function to make the table look pretty
+knitr::kable(gapminderC)
+
+#created a discrete year variable, so that I could have a seperate colour for each year on the graph
+gapminderC$year_discrete <- as.factor(gapminderC$year)
+
+gapminderC %>% 
+ggplot(aes(x=Poland_lifeExp, y=Canada_lifeExp, label=year_discrete)) + 
+  geom_point(aes(colour=year_discrete)) + #plotting points
+  geom_text(aes(colour=year_discrete), hjust=0.5, vjust=-0.5) + #plotting year labels on above points
+  scale_colour_discrete("Year") + #seperate colour for each year
+  scale_x_continuous(name="Life Expectancy for Poland") + 
+  scale_y_continuous(name="Life Expectancy for Canada") +
+  theme_bw()
+```
+
+Plotting life expectancy for each country, it's clear that both countries enjoyed an increase in life expectancy in more recent years, but also that life expectancy for Poland stagnated from 1972 until 1992, and then finally began to increase along with Canada again in 1997.
+
+#Join, merge, look up.
+
+##Activity #1.
+
+- Create a second data frame, complementary to Gapminder. Join this with (part of) Gapminder using a  dplyr join function and make some observations about the process and result. 
+- Explore the different types of joins. 
+
+For this activity I decided used data from the World Health Organization (WHO). They had an interesting data set for the percentage of insufficiently active individuals in each country [http://apps.who.int/gho/data/node.main.A893?lang=en]. I thought this kind of information would nicely compliment variables already in the gapminder data set. Unfortunately, the WHO data was only collected in 2010, and so to match up with the gapminder data, I decided to only include gapminder data from 2007, the closest year in the gapminder data set to the 2010 WHO data.
+
+```{r}
+who_pa_data <- read.csv("WHO_pa_data.csv", header=TRUE) #import WHO data
+str(who_pa_data) #check out the newly imported data
+
+#clean up the imported data
+who_pa_data_A <- who_pa_data %>% 
+  rename(c("Insufficiently.active..age.standardized.estimate." = "insuffAct")) %>% 
+  rename(c("Country" = "country")) %>%
+  select(country, insuffAct)
+
+#prep the data for joining
+gapminderD <- gapminder %>%
+  filter(year==2007) #activity data is only available for 2010 in the WHO data, so decided to only use gapminder data from 2007, the closest year to 2010
+gapminderD #check out the data
+
+#joining the data sets
+who_gapminder <- left_join(gapminderD, who_pa_data_A) #join gapminder and who data
+who_gapminder #check out the data
+
+who_gapminderC <- who_gapminder %>% 
+  filter(insuffAct >= 0) %>%  #remove countries missing WHO activity data
+  mutate(n_insuffAct = ((insuffAct/100)*pop)) #convert percentage of population that is insufficiently active into an actual number of people who are insufficiently active, by mutiplying % by population
+who_gapminderC #check out the data
+
+who_gapminderC %>% 
+  ggplot(aes(x=gdpPercap, y=lifeExp)) +
+  geom_point(aes(size=n_insuffAct, colour=continent), alpha=0.5) + #size points by number of people who are insufficiently active, and colour points by continent membership
+  scale_size_continuous("N Insufficient Activity") + #rename size legend
+  scale_colour_discrete("Continent") + #rename colour legend
+  scale_x_continuous(name="GDP per Capita") + 
+  scale_y_continuous(name="Life Expectancy") +
+  theme_bw()
+
+who_gapminderC %>% 
+  ggplot(aes(x=gdpPercap, y=lifeExp)) +
+  geom_point(aes(size=pop, colour=continent), alpha=0.5) + #size points by population, and colour points by continent membership
+  scale_size_continuous("Population") + #rename size legend
+  scale_colour_discrete("Continent") + #rename colour legend
+  scale_x_continuous(name="GDP per Capita") + 
+  scale_y_continuous(name="Life Expectancy") +
+  theme_bw()
+
+
+```
+
+Through this graph, I was hoping to see whether there is a pattern where the number of people who are insufficiently active is reflected in life expectancy, or its relationship with GDP per capita. I can't make any inferences on that based on this graph, but I do notice that most countries have relatively similarly sized points. Hence, there seems to be a small spread in the WHO activity data. 
+The notable exception would be certain countries in Asia, which seem to have the largest number of people who are insufficiently active. This may have to do with the fact that these countries generally have a large population though.
+
+#EXTRA: join() versus merge().
+
+```{r}
+#using the join() function
+who_gapminder <- left_join(gapminderD, who_pa_data_A) #join gapminder and who data
+str(who_gapminder) #check out the data
+```
+
+Using the left_join() function retains all of the data from both the gapminder and WHO data sets, as evidenced by the 142 observations. So, if one data set does not have value x on the joining variable, then that's okay - the joined data.frame will still include value x.
+
+For example, let's take a look the gapminder data:
+
+```{r}
+head(gapminderD)
+```
+
+And then at the WHO data:
+
+```{r}
+head(who_pa_data_A)
+```
+
+It looks like the WHO data set includes Andorra, but the gapminder data set does not.
+
+So how does join() handle this?
+
+```{r}
+head(who_gapminder)
+```
+
+It looks like our new joined data does not include Andorra.
+
+Why? Because we specified gapminder as the first data set in our join function, and this is the one that will be joined to. So if gapminder has a country that WHO doesn't, that's okay - it will be included. But if WHO has a country that gapminder doesn't, then it won't be included.
+
+For example, WHO does not include West Bank and Gaza as a country, but gapminder does.
+
+```{r}
+tail(gapminderD)
+tail(who_pa_data_A)
+```
+
+
+```{r}
+tail(who_gapminder)
+```
+
+And as we can see, that is okay, because join() will still include West Bank and Gaza in the joined data set.
+
+So what happens when we use the merge() function instead?
+
+Here, it looks like merge() cuts down the observations to 121, meaning that it only preserves data that is common to both variables in each data set. So this time, if WHO doesn't have a country that gapminder does, it will not be included in the newly merged data.
+
+```{r}
+#using the merge() function
+who_gapminder_Mrg <- merge(gapminderD, who_pa_data_A) #join gapminder and who data
+str(who_gapminder_Mrg) #check out the data
+```
+
+To illustrate, think back to the last 6 rows of data in gapminder we just looked at for the join() function discussion. You'll remember that West Bank and Gaza was in the gapminder data, but not the WHO data; and Andorra was in the WHO data, but not the gapminder data. How does merge() handle these discrepancies?
+
+```{r}
+tail(who_gapminder_Mrg)
+```
+
+As we can see, West Bank and Gaza are not included in the merged data set this time, unlike when we used the join() function.
+
+You may have also noticed that Vietnam are actually in both data sets, but that WHO spells it Viet Nam, and gapminder calls it Vietnam. Whether merging or joining, this is a problem, since R won't recognize it as the same country due to the spelling. So another step for data cleaning to keep in mind.
+
+#EXTRA: match()
+
+The function match() operates differently from merge() and join(), in that it returns a vector, rather than a data.frame. 
+
+```{r}
+#using the match() function
+who_gapminder_Mtch <- match(gapminderD$country, who_pa_data_A$country) #match by country
+who_gapminder_Mtch
+```
+
+With join(), we can tell which values in one data set match with values in another data set. For example, because the first value is also the number 1, we know that the first value in of country in the gapminder data matches that of country in the WHO data. However, the 4th value in gapminder is actually the 5th value in WHO.
+
+We can prove this to ourselves by calling the first value of country in each data set.
+
+```{r}
+gapminderD$country[1]
+who_pa_data_A$country[1]
+```
+
+Here, we see that the first value of country in each data set does indeed match: both are Afghanistan.
+
+So what is going on with the fourth value of gapminder, where there seems to be a discrepancy with the WHO data?
+
+```{r}
+gapminderD$country[4]
+```
+
+In gapminder, the value is Angola.
+
+But in the WHO data...
+
+```{r}
+who_pa_data_A$country[4]
+```
+
+The value is Andorra.
+
+So where is Angola in the WHO data? According to the match() function, it is in the 5th row.
+
+```{r}
+who_pa_data_A$country[5]
+```
+
+And that's exactly what we find.
+
+Match() is very different from join() and merge(), not only because it returns a vector, but because of the information we get from it: it tells us which values match and how to find values that don't exactly match the same rows, for the joining variable, across two data sets. It would be super useful for when you want to know where two data sets don't match up, and where to find matching values.
+
