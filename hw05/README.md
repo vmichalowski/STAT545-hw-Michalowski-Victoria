@@ -1,3 +1,5 @@
+Here is my [homework 5 md file](https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw04/hw04.md).
+
 PROCESS REPORT
 
 FACTOR MANAGEMENT: This was not too difficult, except I found that at the end, I had ended up with a continent factor that looked right, but it seemed strange that it was seperated from the rest of the data. I'm not sure if I did this wrong or not, but I had a hard time understanding why I would ever need to seperate a factor from the rest of the data. Perhaps for plotting purposes?
