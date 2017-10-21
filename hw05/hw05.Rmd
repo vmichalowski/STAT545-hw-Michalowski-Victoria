@@ -202,7 +202,7 @@ The biggest take away from this figure is that most countries consistently enjoy
 ggsave("hw05_scatterplot-EuropeanCountries-vs-lifeExp.png", p3)
 ```
 
-
+![](hw05_scatterplot-EuropeanCountries-vs-lifeExp.png)
 
 
 
