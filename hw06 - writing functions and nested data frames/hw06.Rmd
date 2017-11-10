@@ -7,7 +7,7 @@ output: github_document
 
 # 2. Writing Functions
 
-## starting point: the linear regression function example
+## starting point: the linear regression function example.
 
 First, load the Gapminder data.
 
@@ -31,7 +31,7 @@ p <- ggplot(j_dat, aes(x = year, y = lifeExp))
 p + geom_point() + geom_smooth(method = "lm", se = FALSE)
 ```
 
-Fit the regression.
+Fit the linear regression. 
 
 ```{r}
 j_fit <- lm(lifeExp ~ year, j_dat)
@@ -47,13 +47,13 @@ coef(j_fit)
 
 This intercept makes more sense, and by eyeballing the plot above, we can tell that it's in line with the data and more interpretable.
 
-## Turn this working code into a function.
+## turn this working code into a function.
 
 Drop the working code into the basic definition of a function.
 
 ```{r}
-le_linear_fit <- function(dat, offset = 1952) {
-  the_fit <- lm(lifeExp ~ I(year - offset), dat)
+le_linear_fit <- function(dat) {
+  the_fit <- lm(lifeExp ~ I(year - 1952), dat)
   coef(the_fit)
 }
 le_linear_fit(j_dat)
@@ -62,14 +62,14 @@ le_linear_fit(j_dat)
 Notice we get the same result as before. The names on this return value are not intuitive - fix names next to make them interpretable.
 
 ```{r}
-le_linear_fit <- function(dat, offset = 1952) {
-  the_fit <- lm(lifeExp ~ I(year - offset), dat)
+le_linear_fit <- function(dat) {
+  the_fit <- lm(lifeExp ~ I(year - 1952), dat)
   setNames(coef(the_fit), c("intercept", "slope"))
 }
 le_linear_fit(j_dat)
 ```
 
-## Rotate through other examples in a clean workspace
+## rotate through other examples in a clean workspace.
 
 It's a good idea to test your function on other data during development. The most common catch is accidental hard-wires of examples in the function.
 
@@ -91,22 +91,22 @@ Next, I cleaned out my workspace, re-ran the minimum amount of code, and re-test
 ```{r}
 rm(list = ls())
 
-le_linear_fit <- function(dat, offset = 1952) {
-  the_fit <- lm(lifeExp ~ I((year - offset)^2), dat)
+le_linear_fit <- function(dat) {
+  the_fit <- lm(lifeExp ~ I(year - 1952), dat)
   setNames(coef(the_fit), c("intercept", "slope"))
 }
 le_linear_fit(gapminder %>% 
                 filter(country == "Sweden"))
 ```
 
-## generalize: quadratic regression
+## generalize: quadratic regression.
 
 Include a squared term to extend the example from a linear regression to a quadratic regression.
 
 ```{r}
-le_quadratic_fit <- function(dat, offset = 1952) {
-  the_fit2 <- lm(lifeExp ~ I(year - offset) + I((year - offset)^2), dat)
-  setNames(coef(the_fit2), c("intercept", "Year Slope", "Year^2 Slope"))
+le_quadratic_fit <- function(dat) {
+  the_fit2 <- lm(lifeExp ~ I(year - 1952) + I((year - 1952)^2), dat)
+  setNames(coef(the_fit2), c("intercept", "Year", "Year2"))
 }
 
 le_quadratic_fit(gapminder %>% 
@@ -116,7 +116,7 @@ le_quadratic_fit(gapminder %>%
 
 # 6. Work with a nested data frame
 
-## Nest the data by country and continent.
+## nest the data by country and continent.
 
 Nesting is an extension of grouping. Unlike grouping though, the collapse to a single row per group happens right away. The non-grouping variables are packaged into group-specific data frames that are held in a list-column. Then the computation to the components of this list gets applied.
 
@@ -147,7 +147,7 @@ gap_nested[["data"]][[1]]
 gap_nested$data[[1]]
 ```
 
-Apply a function.
+## apply a function.
 
 Let's try to iterate over the elements of gap_nested$data, using purrr::map().
 
@@ -167,12 +167,12 @@ le_vs_yr <- function(df) {
 le_vs_yr(gap_nested[[123, "data"]])
 ```
 
-## Use the broom package to get information out of my quadratic model.
+## use the broom package to get information out of my quadratic model.
 
 ```{r}
 library(broom)
 
-le_vs_yr <- function(df) {
+le_vs_yr1 <- function(df) {
   quad_fit <- lm(lifeExp ~ I(year - 1952) + I((year - 1952)^2), data = df)
   tidy(quad_fit)
 }
@@ -186,7 +186,7 @@ What if you are interested in the fitted values and residuals for each of the or
 Use augment, which augments the original data with information from the model.
 
 ```{r}
-le_vs_yr <- function(df) {
+le_vs_yr2 <- function(df) {
   quad_fit <- lm(lifeExp ~ I(year - 1952) + I((year - 1952)^2), data = df)
   head(augment(quad_fit))
 }
@@ -198,43 +198,124 @@ Each new column (e.g. .fitted, .se.fit, etc.) begins with a . to avoid overwritt
 Access summary statistics (such as R^2 and the F-statistic) with the glance function.
 
 ```{r}
-le_vs_yr <- function(df) {
+le_vs_yr3 <- function(df) {
   quad_fit <- lm(lifeExp ~ I(year - 1952) + I((year - 1952)^2), data = df)
   glance(quad_fit)
 }
 le_vs_yr(gap_nested[[123, "data"]])
 ```
 
-## Explore the estimated coefficients
-
-Scale up to all countries by putting the function inside a dyplr::do() call.
+Use purrr:map() to apply the fitting function le_vs_yr() to the first 2 elements of gap_nested$data.
 
 ```{r}
-le_vs_yr <- function(df) {
-  quad_fit <- lm(lifeExp ~ I(year - 1952) + I((year - 1952)^2), data = df)
-    setNames(data.frame(t(coef(quad_fit))), c("intercept", "slope", "slope^2"))
+fits <- map(gap_nested$data[1:2], le_vs_yr)
+fits
+```
+
+To scale this up to all countries, use map() inside of mutate() to store the models inside gap_nested, in another list-column.
+
+```{r}
+(gap_nested <- gap_nested %>% 
+   mutate(fit = map(data, le_vs_yr)))
+```
+
+Now we have a new list-column, the fit variable, which holds 142 fitted models.
+
+We want to pull information out of these complicated objects into something simpler such as a tibble. Let's get back to the broom function to take lm() fit and turn it into a useful tibble.
+
+```{r}
+tidy(gap_nested$fit[[1]])
+```
+
+The result is a three row data frame, one row for the intercept, another for the first slope term, and another for the squared slope term.
+
+Apply tidy() to the model for each country with the same map() inside mutate() approach as above.
+
+```{r}
+(gap_nested <- gap_nested %>% 
+   mutate(tidy = map(fit, tidy)))
+```
+
+Lastly, we can simplify back to a normal tibble, using unnest() to complete the circle.
+
+```{r}
+(gap_coefs <- gap_nested %>% 
+select(continent, country, tidy) %>% 
+unnest(tidy))
+```
+
+Now we have an intercept, slope, and squared slope term for each country.
+
+Putting that all together into one spot:
+
+```{r}
+gap_nested <- gapminder %>%
+  group_by(continent, country) %>% 
+  nest()
+
+le_vs_yr <- function (df) {
+  lm(lifeExp ~ I(year - 1952) + I((year - 1952)^2), data = df)
 }
-gfits_me <- gapminder %>%
-  group_by(country) %>% 
-  do(le_vs_yr(.))
-gfits_me
+
+gap_coefs <- gap_nested %>% 
+  mutate(fit = map(data, le_vs_yr),
+         tidy = map(fit, tidy)) %>% 
+  select(continent, country, tidy) %>% 
+  unnest(tidy)
 ```
 
-Let's try some plots.
+
+## explore the estimated coefficients.
 
 ```{r}
-ggplot(gfits_me, aes(x = intercept)) + geom_density() + geom_rug()
+(gap_coefs <- gap_coefs %>%
+   mutate(term = recode(term,
+                        `(Intercept)` = "intercept",
+                        `I(year - 1952)` = "slope",
+                        `I((year - 1952)^2)` = "slope2")))
+```
+
+Next, I wanted to try out gap_ests, a reshaped version of estimates, for numerical summarization and visualization.
+
+```{r}
+(gap_ests <- gap_coefs %>% 
+   select(continent:estimate) %>% 
+   spread(key = term, value = estimate))
+```
+
+To take a look at the numerical summaries of the above:
+
+```{r}
+gap_ests %>% 
+  select(intercept, slope, slope2) %>% 
+  summary()
+```
+
+We can see that the summaries seem reasonable.
+
+Lastly, we can also look at the full distribution visually, using ggplot:
+
+```{r}
+ggplot(gap_coefs, aes(x = estimate)) +
+  geom_density() + 
+  geom_rug() + 
+  facet_wrap(~ term, scales = "free")
 ```
 
 ```{r}
-ggplot(gfits_me, aes(x = slope)) + geom_density() + geom_rug()
-```
-
-```{r}
-ggplot(gfits_me, aes(x = intercept, y = slope)) +
+ggplot(gap_ests, aes(x = intercept, y = slope)) +
   geom_point() +
-  geom_smooth(se = FALSE)
+  geom_smooth(se=FALSE, lwd = 2)
 ```
+
+```{r}
+ggplot(gap_ests, aes(x = intercept, y = slope2)) +
+  geom_point() +
+  geom_smooth(se=FALSE, lwd = 2)
+```
+
+
+
 
 
 
