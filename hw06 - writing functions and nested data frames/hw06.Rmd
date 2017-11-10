@@ -5,7 +5,7 @@ date: "November 9, 2017"
 output: github_document
 ---
 
-# 2. Writing Functions
+## 2. Writing Functions
 
 ## starting point: the linear regression function example.
 
@@ -114,7 +114,7 @@ le_quadratic_fit(gapminder %>%
 ```
 
 
-# 6. Work with a nested data frame
+## 6. Work with a nested data frame
 
 ## nest the data by country and continent.
 
