@@ -7,7 +7,7 @@ output: github_document
 
 #2. Writing Functions
 
-##starting point: the linear regression function example.
+#starting point: the linear regression function example.
 
 First, load the gapminde data.
 
@@ -47,7 +47,7 @@ coef(j_fit)
 
 This intercept makes more sense, and by eyeballing the plot above, we can tell that it's in line with the data and more interpretable.
 
-##turn this working code into a function.
+#turn this working code into a function.
 
 Drop the working code into the basic definition of a function.
 
@@ -69,7 +69,7 @@ le_linear_fit <- function(dat) {
 le_linear_fit(j_dat)
 ```
 
-##rotate through other examples in a clean workspace.
+#rotate through other examples in a clean workspace.
 
 It's a good idea to test your function on other data during development. The most common catch is accidental hard-wires of examples in the function.
 
@@ -99,7 +99,7 @@ le_linear_fit(gapminder %>%
                 filter(country == "Sweden"))
 ```
 
-##generalize: quadratic regression.
+#generalize: quadratic regression.
 
 Include a squared term to extend the example from a linear regression to a quadratic regression.
 
@@ -116,7 +116,7 @@ le_quadratic_fit(gapminder %>%
 
 #6. Work with a nested data frame
 
-##nest the data by country and continent.
+#nest the data by country and continent.
 
 Nesting is an extension of grouping. Unlike grouping though, the collapse to a single row per group happens right away. The non-grouping variables are packaged into group-specific data frames that are held in a list-column. Then the computation to the components of this list gets applied.
 
@@ -147,7 +147,7 @@ gap_nested[["data"]][[1]]
 gap_nested$data[[1]]
 ```
 
-##apply a function.
+#apply a function.
 
 Let's try to iterate over the elements of gap_nested$data, using purrr::map().
 
@@ -167,7 +167,7 @@ le_vs_yr <- function(df) {
 le_vs_yr(gap_nested[[123, "data"]])
 ```
 
-##use the broom package to get information out of my quadratic model.
+#use the broom package to get information out of my quadratic model.
 
 ```{r}
 library(broom)
@@ -265,7 +265,7 @@ gap_coefs <- gap_nested %>%
 ```
 
 
-##explore the estimated coefficients.
+#explore the estimated coefficients.
 
 ```{r}
 (gap_coefs <- gap_coefs %>%
