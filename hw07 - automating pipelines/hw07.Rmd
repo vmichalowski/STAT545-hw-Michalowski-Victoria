@@ -10,7 +10,7 @@ For this assignment, I was having trouble downloading the gapminder data from th
 The first step was to download the raw data, which I had already uploaded to my github repo.
 
 ```{r}
-download.file("https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw07%20-%20automating%20pipelines/CO2_emissions-CDIAC.xlsx?raw=true", destfile="CO2_emissions-CDIAC.xlsx")
+
 ```
 
 Next, I wanted to do some basic exploratory analysis.
@@ -18,8 +18,7 @@ Next, I wanted to do some basic exploratory analysis.
 Bring the data in as data frame.
 
 ```{r}
-CO2 <- read.xlsx("CO2_emissions-CDIAC.xlsx", 
-                sheetIndex = 1)
+
 ```
 
 Save a couple descriptive plots to file with highly informative names.
