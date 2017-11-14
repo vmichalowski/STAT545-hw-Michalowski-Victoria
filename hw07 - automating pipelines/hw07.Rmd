@@ -7,4 +7,29 @@ output: github_document
 
 For this assignment, I was having trouble downloading the gapminder data from the detailed instructions of the assignment, so I went to the gapminder website (http://www.gapminder.org/data/) looking for the original source, and found that they have many different kinds of worldwide data sets. I decided to choose one on CO2 emissions across different countries in the world.
 
-The first step remained to download the data. To do this, I uploaded the data on to my github repo first.
+The first step was to download the raw data, which I had already uploaded to my github repo.
+
+```{r}
+download.file("https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw07%20-%20automating%20pipelines/CO2_emissions-CDIAC.xlsx?raw=true", destfile="CO2_emissions-CDIAC.xlsx")
+```
+
+Next, I wanted to do some basic exploratory analysis.
+
+Bring the data in as data frame.
+
+```{r}
+CO2 <- read.xlsx("CO2_emissions-CDIAC.xlsx", 
+                sheetIndex = 1)
+```
+
+Save a couple descriptive plots to file with highly informative names.
+Reorder the continents based on life expectancy. You decide the details.
+Sort the actual data in a deliberate fashion. You decide the details, but this should at least implement your new continent ordering.
+Write the Gapminder data to file(s), for immediate and future reuse.
+
+Basic data cleaning:
+
+Are there wonky factors? Consider bringing in as character, addressing their deficiencies, then converting to factor.
+Are there variables you’re just willing to drop at this point? Do it!
+Are there dates and times that need special handling? Do it!
+Are there annoying observations that require very special handling or crap up your figures (e.g. Oceania)? Drop them!
