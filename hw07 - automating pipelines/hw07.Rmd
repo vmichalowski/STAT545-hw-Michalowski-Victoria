@@ -2,7 +2,7 @@
 title: "hw07"
 author: "Victoria Michalowski"
 date: "November 13, 2017"
-output: html_document
+output: github_document
 ---
 
 For this assignment, I was having trouble downloading the gapminder data from the detailed instructions of the assignment, so I went to the gapminder website (http://www.gapminder.org/data/) looking for the original source, and found that they have many different kinds of worldwide data sets. I decided to choose one on CO2 emissions across different countries in the world.
