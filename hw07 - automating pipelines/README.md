@@ -2,7 +2,7 @@ PROCESS REPORT
 
 To hopefully ease interpretation of where all of the files in my folder came from and what they each mean, I'll outline what steps I took in this assignment.
 
-1. Before I really understood how to put scripts together, I took the old approach of writing all of my code in an R markdown file, which is why I have a file called ["hw07.Rmd"](https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw07%20-%20automating%20pipelines/hw07.Rmd), for which the rendered md file can be found [here](https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw07%20-%20automating%20pipelines/hw07.md), in case that's helpful.
+1. Before I really understood how to put scripts together, I took the old approach of writing all of my code in an R markdown file, which is why I have a file called "hw07.Rmd", which I won't bother directing you to, as it was taken apart for individual scripts anyways. I thought it might be worth mentioning though, to give an idea of what my departure point was.
 2. I used this hw07.Rmd file to make sure that all of my code was working as I intended. This is the point where I started figuring out how to automate the pipeline.
 3. I took apart my hw07.Rmd file and put each seperate part into it's own R script file:
 - [script1_download_data.R](https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw07%20-%20automating%20pipelines/script1_download_data.R): downloaded data for the assignment.
