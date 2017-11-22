@@ -75,13 +75,14 @@ baby_namesLong <- baby_names %>%
 #change year from chr to num
 baby_namesLong$Year <- as.numeric(baby_namesLong$Year)
 
-tail(baby_namesLong)
+head(baby_namesLong)
 ```
 
 # Write cleaned data to csv file
 
 ```{r}
 library(readr)
+write_rds(baby_namesLong, "baby_namesLong.csv")
 write_csv(baby_namesLong, "baby_namesLong.csv")
 ```
 
