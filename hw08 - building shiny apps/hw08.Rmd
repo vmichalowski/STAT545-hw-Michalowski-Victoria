@@ -1,5 +1,5 @@
 ---
-title: "hw08"
+title: "Homework 8"
 author: "Victoria Michalowski"
 date: "November 20, 2017"
 output: github_document
@@ -16,9 +16,9 @@ library(shiny)
 Basic template for any shiny app:
 
 ```{r}
-ui <- ui <- fluidPage()
-server <- function(input, output) {}
-shinyApp(ui = ui, server = server) #no need to call shinyApp() when splitting template into seperate ui and server parts
+# ui <- ui <- fluidPage()
+# server <- function(input, output) {}
+# shinyApp(ui = ui, server = server) #no need to call shinyApp() when splitting template into seperate ui and server parts
 ```
 
 This template initializes an empty UI and an empty server, and runs an app using these parts.
@@ -81,7 +81,6 @@ head(baby_namesLong)
 # Write cleaned data to csv file
 
 ```{r}
-library(readr)
 write_rds(baby_namesLong, "baby_namesLong.csv")
 write_csv(baby_namesLong, "baby_namesLong.csv")
 ```
