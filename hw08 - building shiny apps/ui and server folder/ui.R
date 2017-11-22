@@ -1,4 +1,5 @@
-download.file("")
+download.file("https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/raw/master/hw08%20-%20building%20shiny%20apps/baby_namesLong.csv", destfile="baby_namesLong.csv")
+baby_namesLong <- read_csv("baby_namesLong.csv")
 
 
 ui <- fluidPage(
