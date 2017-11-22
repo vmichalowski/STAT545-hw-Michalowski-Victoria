@@ -1,0 +1,89 @@
+---
+title: "hw08"
+author: "Victoria Michalowski"
+date: "November 20, 2017"
+output: github_document
+---
+
+# First Steps
+
+Load the shiny app package.
+
+```{r}
+library(shiny)
+```
+
+Basic template for any shiny app:
+
+```{r}
+ui <- ui <- fluidPage()
+server <- function(input, output) {}
+shinyApp(ui = ui, server = server) #no need to call shinyApp() when splitting template into seperate ui and server parts
+```
+
+This template initializes an empty UI and an empty server, and runs an app using these parts.
+
+# Create separate UI and server files
+
+All code that is assigned to the ui variable is put into an file called ui.R, and all code assigned to the sevrer variable is put into server.R These are (and must be) put into the same isolated folder.
+
+# The dataset
+
+For this assignment, I wanted to try using a different data set than the one we explored in class. I looked into what other public data Birtish Columbia has available on their data catalogue, and found one on baby names over the past 100 years for girls (https://catalogue.data.gov.bc.ca/dataset/most-popular-girl-names-for-the-past-100-years) and boys (https://catalogue.data.gov.bc.ca/dataset/most-popular-boys-names-for-the-past-100-years).
+
+The ministry of health already actually has an interactive plot for baby names (https://www.health.gov.bc.ca/vs//babynames/), but I wanted to see if I could improve on it.
+
+# Get the data
+
+```{r}
+library(tidyverse)
+setwd("C:/Users/Victoria/Desktop/STAT 545A/STAT545 Homework/STAT545-hw-Michalowski-Victoria/hw08 - building shiny apps")
+
+
+boys <- read_csv("bc-popular-boys-names.csv")
+# add "sex" variable so know that these rows belong to male names
+boys <- boys %>% 
+  mutate(Sex = 1)
+head(boys)
+
+
+girls <- read_csv("bc-popular-girls-names.csv")
+# add "sex" variable so know that these rows belong to female names
+girls <- girls %>%
+  mutate(Sex = 2)
+head(girls)
+```
+
+# Join boy and girl name data
+
+Since the data are both set up in a parallel way, I can use the bind_rows() function to just paste the rows from one data set into the other.
+
+```{r}
+baby_names <- bind_rows(boys, girls, id=NULL)
+
+baby_names <- baby_names %>% 
+  arrange(Name)
+head(baby_names)
+```
+
+The data is currently in a "wide" format, where every year is it's own variable. For the purposes of this app, I want to have it in a "long" format, so that every year listed was simply contained in a variable called "year".
+
+```{r}
+baby_namesLong <- baby_names %>%
+  gather(key = "Year", value = "Frequency", `1915`:`2014`)
+
+#change year from chr to num
+baby_namesLong$Year <- as.numeric(baby_namesLong$Year)
+
+tail(baby_namesLong)
+```
+
+# Write cleaned data to csv file
+
+```{r}
+write_csv(baby_namesLong, "baby_namesLong.csv")
+saveRDS(baby_namesLong, "baby_namesLong.csv")
+```
+
+
+
