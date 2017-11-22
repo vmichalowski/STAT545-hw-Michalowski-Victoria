@@ -5,8 +5,8 @@ account: vmichalowski
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 238613
-bundleId: 1089208
+bundleId: 1089227
 url: https://vmichalowski.shinyapps.io/baby_names_app/
-when: 1511309206.71262
+when: 1511309997.2203
 asMultiple: FALSE
 asStatic: FALSE

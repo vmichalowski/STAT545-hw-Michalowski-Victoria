@@ -81,8 +81,8 @@ tail(baby_namesLong)
 # Write cleaned data to csv file
 
 ```{r}
+library(readr)
 write_csv(baby_namesLong, "baby_namesLong.csv")
-saveRDS(baby_namesLong, "baby_namesLong.csv")
 ```
 
 
