@@ -1,0 +1,221 @@
+---
+title: "hw10"
+author: "Victoria Michalowski"
+date: "December 5, 2017"
+output: github_document
+---
+
+For this assignment, I wanted to try building on the scraping example we did in class, as well as try an API.
+
+The first step was to load the required libraries that would be useful for either approach.
+
+```{r}
+library(tidyverse)
+library(purrr)
+library(glue)
+library(stringr)
+```
+
+# Scraping data
+
+The libraries that I used specifcally for scraping data were the xml2 and rvest packages. I then read in the URL from which I would be scraping data from, and assigned it to "url_CAtempwiki". The URL takes you to a wikipedia page on temperature in Canada. 
+
+My goal was to scrape data from a table on that page that had information about average temperatures across different major cities in Canada. In order to get the table within the webpage, I had to read in the webpage using the read_html() function first:
+
+```{r}
+library(xml2)
+library(rvest)
+
+url_CAtempwiki <- "https://en.wikipedia.org/wiki/Temperature_in_Canada"
+page_title <- read_html(url_CAtempwiki) 
+head(page_title)
+```
+
+Now I can go into that webpage, and find the specific peice that I'm interested in scraping - the table of average temperatures in Canada. To do this, I used shift+ctrl+c to inspect the elements of the html page, and find the table element that I wanted. Once I had that, I saved it as a data frame.
+
+```{r}
+temp_tableCA <- page_title %>% 
+  # right click "..." beside the selected table element and copy the xpath
+  html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[1]') %>% 
+  html_table
+
+temp_tableCA <- as.data.frame(temp_tableCA)
+head(temp_tableCA)
+```
+
+Now that the table is saved as a data frame, I could go in and clean the data, which for what I wanted to do, involved removing excess characters from the community and temperature variables.
+
+```{r}
+# remove citation source (e.g. [1], [10]) from community variable text
+
+temp_tableCA_clean_1 <- temp_tableCA %>% 
+  head(n=9) %>% 
+  mutate(Community1 = str_sub(Community, 1, nchar(Community)-3))
+head(temp_tableCA_clean_1)
+
+temp_tableCA_clean_2 <- temp_tableCA %>% 
+  tail(n=31) %>% 
+  mutate(Community1 = str_sub(Community, 1, nchar(Community)-4))
+head(temp_tableCA_clean_2)
+
+temp_tableCA_clean_3 <- bind_rows(temp_tableCA_clean_1, temp_tableCA_clean_2)
+head(temp_tableCA_clean_3)
+```
+
+```{r}
+# clean up temperature vars
+
+temp_tableCA_clean_4 <- temp_tableCA_clean_3 %>% 
+  mutate(July_Avg_High = substr(July.Avg..high..C...F.., start = 21, stop = 24)) %>% 
+  mutate(July_Avg_High = str_trim(July_Avg_High, side = "both")) %>% 
+  mutate(July_Avg_Low = substr(July.Avg..low..C...F.., start = 21, stop = 24)) %>% 
+  mutate(July_Avg_Low = str_trim(July_Avg_Low, side = "both")) %>% 
+  select(Community1, July_Avg_High, July_Avg_Low)
+
+temp_tableCA_clean_4$July_Avg_High <- as.numeric(temp_tableCA_clean_4$July_Avg_High)
+temp_tableCA_clean_4$July_Avg_Low <- as.numeric(temp_tableCA_clean_4$July_Avg_Low)
+
+head(temp_tableCA_clean_4)
+```
+
+With the cleaned data, I then created a plot to visualize differences between average high and low temperatures in July across the different major cities.
+
+```{r}
+# make summary plot
+
+p2 <- temp_tableCA_clean_4 %>% 
+  ggplot(aes(x=Community1, y=July_Avg_High, colour="indianred")) +
+  geom_point() +
+  geom_point(data = temp_tableCA_clean_4, aes(x=Community1, July_Avg_Low, 
+                                               colour="cornflowerblue")) +
+  scale_x_discrete("Canadian City") +
+  scale_y_continuous("Average Temperature in July") +
+  scale_color_manual(name="", labels=c("Low", "High"), values = c("cornflowerblue", "indianred")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=90, vjust=.2, hjust = 1))
+p2
+```
+
+Now it is easy to visually pick out cities of interest and see their averages, and compare them to other cities in Canada. 
+
+This is the same data that was on the wikipedia page, but that was listed in table form instead, so it's not that interesting in itself. The exciting part is that I can take that data and have the freedom to explore it however I want to, and potentially combine it with other data sets to answer unique questions.
+
+# Using an API
+
+Several sites have APIs available to developers, such as FitBit, Spotify, and what I ultimately chose to explore, Twitter. I went with Twitter for the purposes of this assignment because it is widely scraped, and so there are lots of resources, and even packages that streamline the scraping process. As such, it was a nice introduction exercise to using an API, but I definitely want to try others in the future, potentially without pre-built packages that make it easy.
+
+I found the package twitteR seemed to be the most widely used and had a set of nice functions. The first step (when using any API) was to set up a developer account and set up OAuth credentials - these credentials are supposed to be kept private, so I read them in from a seperate script, and kept the skeleton of the code as a comment below.
+
+```{r}
+library(twitteR)
+
+source("APIcred_twitter.R")
+
+# setup_twitter_oauth("xxxxxxxxxxxxxxxxx", "xxxxxxxxxxxxxxxxxxxxxxx", NULL, NULL)
+```
+
+Keeping with the weather theme, and loosely inspired by a public data set I saw on CrowdFlower (https://www.crowdflower.com/data-for-everyone/) that looked at sentiment towards weather in tweets, I thought it would be interesting to do a sentiment analysis of rain-related tweets. To add some complexity, I looked at tweets from the Pacific Northwest as well as tweets from the East Coast, and compared the two.
+
+The searchTwitter function allows you to specify several features of the tweets you are scraping, and for my purposes, I wanted tweets regarding rain, in English, and specified coordinates for Vancouver, and the entire 1000 mile radius surrounding it. I also specified a time frame, but I noticed that I could only get tweets from the past several days, regardless of the time frame specified.
+
+```{r}
+# West Coast
+
+rain_tweets_wc <- searchTwitter('rain', n = 1500, lang='en', since = '2017-09-01', until = '2017-12-07', geocode = '49.2827,123.1207,1000mi')
+```
+
+Once I had the tweets, I converted them from a list into a data frame using the twListToDF() function.
+
+```{r}
+rain_tweets_wc_1 <- twListToDF(rain_tweets_wc)
+head(rain_tweets_wc_1)
+```
+
+Once I had all of the information in data frame form, I could then clean up the variables I wanted.
+
+```{r}
+rain_tweets_wc_2 <- rain_tweets_wc_1 %>% 
+  select(text, created) %>% 
+  mutate(location = 1) %>% #create a var to specify that these are west coast tweets
+  mutate(date = substr(created, start = 1, stop = 10)) %>%  #split up data and time into two seperate vars
+  mutate(time = substr(created, start = 12, stop = 19)) %>% 
+  select(text, location, date, time) #only keep these vars
+head(rain_tweets_wc_2)
+```
+
+And then I did the same thing for East Coast tweets, which were specified as coming from a 1000 mile radius of Toronto.
+
+```{r}
+# East Coast
+
+rain_tweets_ec <- searchTwitter('rain', n = 1500, lang='en', since = '2017-09-01', until = '2017-12-07', geocode = '43.6532,79.3832,1000mi') 
+
+rain_tweets_ec_1 <- twListToDF(rain_tweets_ec)
+
+rain_tweets_ec_2 <- rain_tweets_ec_1 %>% 
+  select(text, created) %>% 
+  mutate(location = 2) %>% 
+  mutate(date = substr(created, start = 1, stop = 10)) %>% 
+  mutate(time = substr(created, start = 12, stop = 19)) %>% 
+  select(text, location, date, time)
+head(rain_tweets_ec_2)
+```
+
+And now that I had two parallel data sets from each coast, I could join them together.
+
+```{r}
+# Join data from both coasts
+
+rain_tweets <- bind_rows(rain_tweets_ec_2, rain_tweets_wc_2)
+head(rain_tweets)
+```
+
+Now that I had all the rain-related tweets in a single data frame, I could use the data for further analysis. So I did a sentiment analysis to see whether people from the East Coast feel differently about rain than people from the West Coast, where we are much more used to it.
+
+The first step here was to load the tidytext package, and decide which lexicon I wanted to use - I went with afinn this time, so that I could get a sentiment score that would be nice to plot later on.
+
+```{r}
+# Sentiment analysis
+
+library(tidytext)
+
+afinn <- get_sentiments("afinn")
+```
+
+Then I took my data frame containing rain-related tweets, and created a sentiment score for each tweeted word.
+
+Some caveats to this apporach to sentiment analysis are that this analysis does not account for sarcasm, differences between "it's not like it rains all the time" and "I like the rain", and users may also have the word "rain" in their usernames, but not actually always be tweeting about rain itself.
+
+```{r}
+rain_tweets_1 <- rain_tweets %>% 
+  unnest_tokens(word, text) %>% # gives each word from each tweet it's own row
+  anti_join(stop_words, by = "word") %>%  # removes dull words
+  inner_join(afinn, by = "word") %>%  # create a score variable
+  group_by(location, date) %>%
+  summarize(Length = n(), Score = sum(score)/Length) # final sentiment score by date and location
+
+rain_tweets_1$location <- as.factor(rain_tweets_1$location) # convert location into a factor for graphing purposes
+
+head(rain_tweets_1)
+```
+
+And now that I created a sentiment score for each tweet by location and date, I can plot them to visualize how East Coasters feel about rain compared to West Coasters, across the last several days.
+
+```{r}
+p1 <- rain_tweets_1 %>% 
+  ggplot(aes(y=Score, x=date, group=location)) +
+  geom_line(aes(colour=location)) +
+  scale_x_discrete("Date") +
+  scale_y_continuous("Sentiment Score") +
+  scale_color_discrete(name="Location", labels=c("West Coast", "East Coast")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=90, vjust=.2, hjust = 1))
+p1
+```
+
+There we have it! From this plot, it looks like West Coasters tend to feel more positively about rain than East Coasters.
+
+As I mentioned earlier, I think some really exciting, but advanced, next steps would be to check out different APIs, and make use of the ever-expanding data available on the web.
+
+
+
