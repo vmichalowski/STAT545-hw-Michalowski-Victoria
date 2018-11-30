@@ -1,4 +1,4 @@
-Here's a link to my [Homework 3.](https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw03/hw3.md)
+Here's a link to my [Homework 3.](https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw03%20-%20intro%20to%20dyplr%20and%20ggplot2/hw3.md)
 
 PROCESS
 
@@ -11,7 +11,7 @@ Different types of ggplot options: https://www.rstudio.com/wp-content/uploads/20
 
 Different ggplot colors: http://sape.inf.usi.ch/quick-reference/ggplot2/colour
 
-For examples of how to adapt ggplot boxplot code: http://ggplot2.tidyverse.org/reference/geom_boxplot.html and http://t-redactyl.io/blog/2016/04/creating-plots-in-r-using-ggplot2-part-10-boxplots.html
+For examples of how to adapt ggplot boxplot code: http://ggplot2.tidyverse.org/reference/geom_boxplot.html and http://t-redactyl.io/blog/2016/04/creating-plots-in-r-using-ggplot2-part-10-boxplots.html (link no longer exists, unfortunately)
 
 The dyplr cheatsheet that Joey posted on Slack :)
 
