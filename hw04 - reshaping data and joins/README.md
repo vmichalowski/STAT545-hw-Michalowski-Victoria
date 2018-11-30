@@ -1,4 +1,4 @@
-This is my [homework 4 md file](https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw04/hw04.md).
+This is my [homework 4 md file](https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw04%20-%20reshaping%20data%20and%20joins/hw04.md).
 
 PROCESS
 
