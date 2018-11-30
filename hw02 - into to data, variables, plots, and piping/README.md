@@ -1,4 +1,4 @@
-Here's a link to my [homework 2.](https://github.com/vmichalowski/STAT545-hw02-Michalowski-Victoria/blob/master/hw02/hw2.md)
+Here's a link to my [homework 2.](https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw02%20-%20into%20to%20data%2C%20variables%2C%20plots%2C%20and%20piping/hw2.md)
 
 
 Report of progress.
