@@ -24,6 +24,6 @@ Even though deleting my repository in GitHub was a horrible way to approach prob
 
 I was also using knit to see whether my code was working at first, but I found that it was much easier to see what was going wrong when I ran lines of code individually in the console, and then put them into R markdown when I was satisfied that I wanted to use that code.
 
-This is my [rendered .md for the Gapminder exploration](https://github.com/vmichalowski/STAT545-hw01-Michalowski-Victoria/blob/master/Gapminder_Data_Exploration.md).
+This is my [rendered .md for the Gapminder exploration](https://github.com/vmichalowski/STAT545-hw-Michalowski-Victoria/blob/master/hw01%20-%20repo%2C%20readme.md%2C%20r%20markdown/Gapminder_Data_Exploration.md).
 
 
